@@ -4,7 +4,9 @@ const { insertPublishers, getCompanyIdFromRefId } = require('../utils/db');
 
 async function scrape(url, page, competitor_id) {
   return new Promise(async (resolve, reject) => {
-    await page.goto(url).catch(err => console.log(err));
+    console.log(url, competitor_id);
+    page.setDefaultNavigationTimeout(0);
+    await page.goto(url, { waitUntil: 'load', timeout: 0 }).catch(err => console.log(err));
     await page.waitForTimeout(1000).catch(err => console.log(err));
     let direct_pubs = await page.$$eval("#flush-collapseBOne > div > table tr", rows => {
       return Array.from(rows, row => {
@@ -45,10 +47,12 @@ async function scrape(url, page, competitor_id) {
 async function start() {
   const browser = await puppeteer.launch({
     headless: true,
-    defaultViewport: {
-      width: 1080,
-      height: 720
-    }
+    defaultViewport: null,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox'
+    ]
+
   });
   const page = await browser.newPage();
   let pages = [443, 605, 217, 551, 12, 552, 553, 601, 410, 206, 558, 292, 599, 76, 98, 255, 302, 386, 417, 303, 419, 105, 421, 442,
@@ -70,26 +74,22 @@ async function start() {
     128, 424, 595, 464, 626, 427, 66, 633, 480, 455, 431, 437, 445, 485, 422, 461, 477, 484, 468, 469, 471, 467, 476, 488, 490, 54, 169, 446, 597, 120, 609, 113, 466, 462,
     230, 450, 631, 44, 18, 644, 606, 402, 207, 428, 60, 434, 598, 4, 623, 109, 607, 11, 57, 15, 68, 13, 440, 10, 94, 88, 158, 416, 482, 441, 545, 712, 448, 198, 56, 216, 252,
     84, 602, 154, 90];
-  // pages = [277, 549, 365];
+  pages = [606];
   let count = 0;
   for (const page_no of pages) {
+    const start = Date.now()
     const competitor_id = await getCompanyIdFromRefId(page_no).catch(err => console.log(err));
     if (competitor_id) {
       const scData = await scrape('https://app.sincera.io/systems/549/compare?competitor_id=' + page_no, page, competitor_id).catch(err => console.log(err));
-      // console.log(scData);
       await insertPublishers(scData);
     } else {
       console.log(`Company not avaiable in db ${page_no}`);
     }
     count++;
-    console.log(`Completed ${pages.length}/${count} last id was: ${page_no}`);
+    const stop = Date.now()
+    console.log(`Completed ${pages.length}/${count} last id was: ${page_no} Time Taken to execute:${(stop - start) / 1000} seconds`);
   }
-  //https://app.sincera.io/systems/549/compare?competitor_id=605
-  // const scData = await scrape('https://app.sincera.io/systems/549/compare?competitor_id=605', page, 605).catch(err => console.log(err));
   browser.close();
-  // const json2csvParser = new Parser();
-  // const csv = json2csvParser.parse(scrape_data);
-  // fs.writeFileSync('companies_with_publishers.csv', csv);
 }
 
 start();

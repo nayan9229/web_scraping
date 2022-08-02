@@ -1,15 +1,7 @@
-// const Pool = require('pg').Pool
-// const pool = new Pool({
-//   user: 'me',
-//   host: 'localhost',
-//   database: 'api',
-//   password: 'password',
-//   port: 5432,
-// })
-
-
 const initOptions = {};
 const pgp = require('pg-promise')(initOptions);
+const chunk = require('lodash/chunk');
+const map = require('lodash/map');
 
 const ssl = { rejectUnauthorized: false }
 // Preparing the connection details:
@@ -32,12 +24,19 @@ async function insertCompany(companies) {
 
 async function insertPublishers(publishers) {
   return new Promise(async (resolve, reject) => {
-    for (const publisher of publishers) {
-      await db.query('INSERT INTO prospective_publishers(${this:name}) VALUES(${this:csv}) ON CONFLICT(pub_domain, access_domain, publisher_type, prospective_company) DO NOTHING', publisher)
-        .catch(err => {
-          console.log(err);
-          console.log(publisher);
-        });
+    chunk_pubs = chunk(publishers, 10000);
+    let count = 0;
+    for (const publishers of chunk_pubs) {
+      all_promise = map(publishers, publisher => {
+        return db.query('INSERT INTO prospective_publishers(${this:name}) VALUES(${this:csv}) ON CONFLICT(pub_domain, access_domain, publisher_type, prospective_company) DO NOTHING', publisher)
+          .catch(err => {
+            console.log(err);
+            console.log(publisher);
+          });
+      });
+      await Promise.all(all_promise).catch(err => console.log(`Promise error: ${err}`));
+      count = count + 10000;
+      console.log(`completed count ${count}`);
     }
     resolve(true);
   });
