@@ -1,0 +1,26 @@
+{
+  "name": "web_scraping",
+  "version": "1.0.0",
+  "description": "Node js web scraping",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nayan9229/web_scraping.git"
+  },
+  "author": "Nayan Mevada",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nayan9229/web_scraping/issues"
+  },
+  "homepage": "https://github.com/nayan9229/web_scraping#readme",
+  "dependencies": {
+    "json2csv": "^5.0.7",
+    "lodash": "^4.17.21",
+    "pg": "^8.7.3",
+    "pg-promise": "^10.11.1",
+    "puppeteer": "^15.5.0"
+  }
+}
