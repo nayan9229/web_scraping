@@ -2,8 +2,8 @@ const MongoClient = require('mongodb').MongoClient;
 
 const DbConnection = function () {
 
-  const db = null;
-  const instance = 0;
+  let db = null;
+  let instance = 0;
 
   async function DbConnect() {
     try {
@@ -19,14 +19,14 @@ const DbConnection = function () {
   async function Get() {
     try {
       instance++;     // this is just to count how many times our singleton is called.
-      console.log(`DbConnection called ${instance} times`);
+      // console.log(`DbConnection called ${instance} times`);
 
       if (db != null) {
-        console.log(`db connection is already alive`);
+        // console.log(`db connection is already alive`);
         return db;
       } else {
-        console.log(`getting new db connection`);
-        db = await DbConnect();
+        // console.log(`getting new db connection`);
+        db = DbConnect();
         return db;
       }
     } catch (e) {
