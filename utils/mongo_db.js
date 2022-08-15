@@ -1,3 +1,4 @@
+require('dotenv').config();
 const MongoClient = require('mongodb').MongoClient;
 
 const DbConnection = function () {
@@ -7,7 +8,7 @@ const DbConnection = function () {
 
   async function DbConnect() {
     try {
-      let url = '';
+      let url = process.env.MONGO_URL;
       let _db = await MongoClient.connect(url);
 
       return _db

@@ -83,9 +83,10 @@ async function start() {
     console.log(`Completed ${pages.length}/${count} last id was: ${page_no}`);
   }
   browser.close();
-  const json2csvParser = new Parser();
-  const csv = json2csvParser.parse(scrape_data);
-  fs.writeFileSync('companies.csv', csv);
+  console.log('Done!!!!');
+  // const json2csvParser = new Parser();
+  // const csv = json2csvParser.parse(scrape_data);
+  // fs.writeFileSync('companies.csv', csv);
 }
 
 start();

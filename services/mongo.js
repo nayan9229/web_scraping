@@ -42,7 +42,7 @@ function addPublisher(publisher) {
   return new Promise(async (resolve, reject) => {
     const db = await getDB();
     const query = { domain: publisher.domain };
-    const update = { $set: publisher };
+    const update = { $setOnInsert: publisher };
     const options = { upsert: true };
     db.collection(DB_TABLE_PUBLISHER).updateOne(query, update, options, (err, res) => {
       if (err) {
@@ -82,3 +82,8 @@ module.exports = {
   addCompany,
   addPublisher
 }
+
+// createUniqueIndexOfCompany();
+// createUniqueIndexOfPublisher();
+// createUniqueIndexOfCompanyUserEmail();
+// createUniqueIndexOfPublisherUserEmail();

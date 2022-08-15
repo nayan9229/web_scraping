@@ -1,3 +1,4 @@
+require('dotenv').config();
 const initOptions = {};
 const pgp = require('pg-promise')(initOptions);
 const chunk = require('lodash/chunk');
@@ -5,7 +6,7 @@ const map = require('lodash/map');
 
 const ssl = { rejectUnauthorized: false }
 // Preparing the connection details:
-const cn = '';
+const cn = process.env.POSTGRES_URL;
 const config = {
   connectionString: cn,
   max: 30,
