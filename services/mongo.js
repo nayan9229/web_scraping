@@ -24,21 +24,26 @@ function addCompany(company) {
         resolve(res);
       }
     });
-    //   db.collection.bulkWrite( [
-    //     { updateOne :
-    //        {
-    //           "filter" : <document>,
-    //           "update" : <document>,
-    //           "upsert" : <boolean>,
-    //           "collation": <document>,
-    //           "arrayFilters": [ <filterdocument1>, ... ]
-    //        }
-    //     }
-    //  ] )
   });
 }
 
 function addPublisher(publisher) {
+  return new Promise(async (resolve, reject) => {
+    const db = await getDB();
+    const query = { domain: publisher.domain };
+    const update = { $set: publisher };
+    const options = { upsert: true };
+    db.collection(DB_TABLE_PUBLISHER).updateOne(query, update, options, (err, res) => {
+      if (err) {
+        reject({ message: err })
+      } else {
+        resolve(res);
+      }
+    });
+  });
+}
+
+function addPublisherWithoutUpdate(publisher) {
   return new Promise(async (resolve, reject) => {
     const db = await getDB();
     const query = { domain: publisher.domain };
@@ -78,12 +83,26 @@ async function createUniqueIndexOfPublisherUserEmail() {
   console.log(is_created);
 }
 
+async function getPublishers(page, perPage, filter = {}) {
+  const db = await getDB();
+  const publishers = [];
+  await db.collection(DB_TABLE_PUBLISHER)
+    .find(filter)
+    .skip(perPage * page)
+    .limit(perPage)
+    .forEach(publisher => publishers.push(publisher));
+  return publishers;
+}
+
 module.exports = {
   addCompany,
-  addPublisher
+  addPublisher,
+  addPublisherWithoutUpdate,
+  getPublishers
 }
 
 // createUniqueIndexOfCompany();
 // createUniqueIndexOfPublisher();
 // createUniqueIndexOfCompanyUserEmail();
 // createUniqueIndexOfPublisherUserEmail();
+// getPublishers(0, 10, { "access_domains": { $ne: null } }).then(data => console.log('data', data)).catch(err => console.log(err));
